@@ -1,0 +1,5 @@
+{
+  "name": "Personalized 12-Week Fitness Planner",
+  "description": "An AI-powered application that generates a personalized 12-week workout program based on user's health conditions, goals, and current supplement stack.",
+  "requestFramePermissions": []
+}
