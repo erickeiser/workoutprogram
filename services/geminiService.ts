@@ -80,7 +80,7 @@ const responseSchema: object = {
 };
 
 export const generateWorkoutPlan = async (): Promise<WorkoutPlan> => {
-  if (!process.env.API_KEY) {
+  if (typeof process === 'undefined' || typeof process.env === 'undefined' || !process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set");
   }
 

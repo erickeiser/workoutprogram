@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { generateWorkoutPlan } from './services/geminiService';
 import type { WorkoutPlan } from './types';
@@ -10,17 +11,20 @@ const App: React.FC = () => {
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isApiKeyError, setIsApiKeyError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPlan = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        setIsApiKeyError(false);
         const generatedPlan = await generateWorkoutPlan();
         setPlan(generatedPlan);
       } catch (err: any) {
         if (err instanceof Error && err.message.includes("API_KEY")) {
-            setError("Configuration Error: The AI API key is missing. The person who deployed this application needs to set the `API_KEY` environment variable. The application cannot function without it.");
+            setIsApiKeyError(true);
+            setError("The Google Gemini API key is missing.");
         } else if (err instanceof Error) {
             setError(err.message);
         } else {
@@ -39,6 +43,23 @@ const App: React.FC = () => {
       return <LoadingSpinner />;
     }
     if (error) {
+       if (isApiKeyError) {
+        return (
+          <div className="flex items-center justify-center min-h-screen">
+            <div role="alert" className="p-6 border border-yellow-600 bg-yellow-900 bg-opacity-20 rounded-lg text-yellow-300 max-w-lg text-center">
+              <h3 className="font-bold text-lg mb-2">Configuration Error</h3>
+              <p className="text-sm">
+                This application requires a Google Gemini API key to function. The person who deployed this app needs to set the <code>API_KEY</code> environment variable.
+                <br/><br/>
+                You can obtain a key from{' '}
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline font-medium hover:text-yellow-200">
+                  Google AI Studio
+                </a>.
+              </p>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div role="alert" className="p-6 border border-red-600 bg-red-900 bg-opacity-20 rounded-lg text-red-300 max-w-lg text-center">
