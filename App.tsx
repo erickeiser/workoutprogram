@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { generateWorkoutPlan } from './services/geminiService';
 import type { WorkoutPlan } from './types';
@@ -20,7 +19,13 @@ const App: React.FC = () => {
         const generatedPlan = await generateWorkoutPlan();
         setPlan(generatedPlan);
       } catch (err: any) {
-        setError(err.message || 'An unexpected error occurred.');
+        if (err instanceof Error && err.message.includes("API_KEY")) {
+            setError("Configuration Error: The AI API key is missing. The person who deployed this application needs to set the `API_KEY` environment variable. The application cannot function without it.");
+        } else if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -36,9 +41,9 @@ const App: React.FC = () => {
     if (error) {
       return (
         <div className="flex items-center justify-center min-h-screen">
-          <div role="alert" className="p-4 border border-red-600 bg-red-900 bg-opacity-20 rounded-lg text-red-300 max-w-md">
-            <h3 className="font-bold">Error Generating Plan</h3>
-            <p className="text-sm mt-2">{error}</p>
+          <div role="alert" className="p-6 border border-red-600 bg-red-900 bg-opacity-20 rounded-lg text-red-300 max-w-lg text-center">
+            <h3 className="font-bold text-lg mb-2">Error Generating Plan</h3>
+            <p className="text-sm">{error}</p>
           </div>
         </div>
       );
